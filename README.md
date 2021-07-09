@@ -3,7 +3,7 @@
 Countdown as Bossbar and perform action when finished (minecraft plugin)
 
 # Introduction
-Sometimes in a quest you want to give the player only a limited amount of time to fulfill the quest requirements, e.g. rescuring the princess or finding the exit from a maze. Or you want to build a minigame  which runs for e.g. three minutes. Then you can use this plugin to display a countdown (or countup) as Bossbar. The bar gets automatically decreased (or inceased) and if the final value is reached, a used defined command is executed.
+Sometimes in a quest you want to give the player only a limited amount of time to fulfill the quest requirements, e.g. rescuring the princess or finding the exit from a maze. Or you want to build a minigame  which runs for e.g. three minutes. Then you can use this plugin to display a countdown (or countup) as Bossbar. The bar gets automatically decreased (or inceased) and if the final value is reached, a user defined command is executed.
 
 # Features
 * User-defined scale, e.g. from "0" to"100", or from "3.2" to "-8.5"
