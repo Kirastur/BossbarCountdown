@@ -11,7 +11,7 @@ Sometimes in a quest you want to give the player only a limited amount of time t
 * Custom templates for different Bossbar layouts
 * Modify Bossbar at runtime (pause/unpause, show/hide, change progress and speed)
 * User-defined start-value and end-value (goal)
-* Execute command when the goad is reached (e.g. teleport the player back, or trigger a BetonQuest Event)
+* Execute command when the goad is reached (e.g. teleport the player back, or start a LibSequence sequence)
 * Also a minecraft custom event is sent when the goal is reached
 * Bossbars are cancelable
 * Can be controlled by API or by commands
