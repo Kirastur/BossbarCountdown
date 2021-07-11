@@ -1,0 +1,19 @@
+name: BossbarCountdown
+version: 1.0
+description: Countdown as Bossbar and perform action when finished
+authors: [Kirastur]
+
+api-version: 1.16
+load: POSTWORLD
+main: de.polarwolf.bbcd.main.Main
+
+commands:
+    bbcd:
+        description: Admin-Commands for BossbarCountdown Plugin
+        permission: hotblocks.admin
+        usage: "Query a list of valid subcommands by using: /bbcd help"
+
+permissions:
+    bbcd.admn:
+        description: Can use the BossbarCountdown Admin-Command
+        default: op
