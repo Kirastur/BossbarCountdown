@@ -30,5 +30,5 @@ templates:
         Start: 1.0
         Speed: -0.01
         End: 0.0
-        Command: tell %player% timeout
+        Command: tell %player% Sorry, you timed out. Game over.
  

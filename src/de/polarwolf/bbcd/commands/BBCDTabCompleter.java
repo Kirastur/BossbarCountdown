@@ -17,8 +17,7 @@ public class BBCDTabCompleter implements TabCompleter{
 	}
 		
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+	protected List<String> handleTabComplete(String[] args) {
 		if (args.length == 0) {
 			return new ArrayList<>();			
 		}
@@ -51,5 +50,16 @@ public class BBCDTabCompleter implements TabCompleter{
 		return new ArrayList<>();			
 
 	}
+
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		try {
+			return handleTabComplete(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<>();			
+	}	
 
 }

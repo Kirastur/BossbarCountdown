@@ -1,7 +1,8 @@
 name: BossbarCountdown
-version: 1.0
+version: 1.1
 description: Countdown as Bossbar and perform action when finished
 authors: [Kirastur]
+website: https://www.spigotmc.org/resources/bossbarcountdown.94169
 
 api-version: 1.16
 load: POSTWORLD
