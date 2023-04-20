@@ -1,48 +1,34 @@
 package de.polarwolf.bbcd.config;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
-import de.polarwolf.bbcd.api.BBCDException;
-import de.polarwolf.bbcd.api.BBCDTemplate;
+import de.polarwolf.bbcd.api.BBCDOrchestrator;
+import de.polarwolf.bbcd.exception.BBCDException;
 
 public class ConfigManager {
 
-	protected Plugin plugin;
-	protected String configPath;
-	protected ConfigSection section;
-	
+	public static final String TEMPLATE_SECTION = "templates";
 
-	public ConfigManager(Plugin plugin, String configPath) {
-		setConfig (plugin, configPath);
+	protected Plugin plugin;
+	protected ConfigSection section;
+
+	public ConfigManager(BBCDOrchestrator orchestrator) {
+		this.plugin = orchestrator.getPlugin();
 		section = new ConfigSection();
 	}
-	
-	
-	public void setConfig (Plugin newPlugin, String newConfigPath) {
-		plugin = newPlugin;
-		configPath = newConfigPath;
-	}
-	
-	
+
 	public void reload() throws BBCDException {
 		plugin.reloadConfig();
-		ConfigurationSection config = plugin.getConfig().getConfigurationSection(configPath);
-		ConfigSection newSection = new ConfigSection();
-		newSection.load(config);
+		ConfigurationSection fileConfig = plugin.getConfig().getConfigurationSection(TEMPLATE_SECTION);
+		ConfigSection newSection = new ConfigSection(fileConfig);
 		section = newSection;
 	}
 
-
-	public Set<BBCDTemplate> getTemplates() {
+	public List<BBCDTemplate> getConfigTemplates() {
 		return section.getTemplates();
-	}
-	
-	
-	public BBCDTemplate findTemplate(String templateName) {
-		return section.findTemplate(templateName);
 	}
 
 }

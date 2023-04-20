@@ -1,59 +1,57 @@
 package de.polarwolf.bbcd.config;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import de.polarwolf.bbcd.api.BBCDException;
-import de.polarwolf.bbcd.api.BBCDTemplate;
+import de.polarwolf.bbcd.exception.BBCDException;
 
 public class ConfigSection {
 
-	protected Set<BBCDTemplate> templateSet = new HashSet<>();
-	
-	
-	public Set<BBCDTemplate> getTemplates() {
-		return new HashSet<>(templateSet);
-	}
-	
+	protected List<BBCDTemplate> templates = new ArrayList<>();
 
-	protected BBCDTemplate createTemplate(String name, Map<String,String> parameters ) throws BBCDException {
-		return new BBCDTemplate (name, parameters);
-	}
-	
-	
-	protected BBCDTemplate loadTemplate(ConfigurationSection config) throws BBCDException {
-		String name = config.getName();
-		Map <String,String> parameters = new HashMap<>();
-		for (String attributeName : config.getKeys(false)) {
-			String value = config.getString(attributeName);
-			parameters.put(attributeName, value);
-		}
-		return createTemplate(name, parameters);
+	protected ConfigSection() {
 	}
 
+	protected ConfigSection(ConfigurationSection fileSection) throws BBCDException {
+		loadFromFile(fileSection);
+	}
 
-	// You cannot call "load" directly, because the ConfigManager does not expose this object
-	public void load(ConfigurationSection config) throws BBCDException {
-		templateSet.clear();
-		for (String ruleName : config.getKeys(false)) {
+	public List<BBCDTemplate> getTemplates() {
+		return new ArrayList<>(templates);
+	}
 
-			ConfigurationSection section = config.getConfigurationSection(ruleName);
-			if (section == null) {
-				throw new BBCDException(config.getName(), "Config Syntax Error", ruleName);
+	protected void addTemplate(BBCDTemplate newTemplate) {
+		templates.add(newTemplate);
+	}
+
+	protected void addTemplate(String name, Map<String, String> parameters) throws BBCDException {
+		BBCDTemplate newTemplate = new BBCDTemplate(name, parameters);
+		addTemplate(newTemplate);
+	}
+
+	protected void addTemplate(ConfigurationSection fileSection) throws BBCDException {
+		BBCDTemplate newTemplate = new BBCDTemplate(fileSection);
+		addTemplate(newTemplate);
+	}
+
+	protected void loadFromFile(ConfigurationSection fileSection) throws BBCDException {
+		for (String myTemplateName : fileSection.getKeys(false)) {
+			if (!fileSection.contains(myTemplateName, true)) {
+				continue;
 			}
-
-			BBCDTemplate newTemplate = loadTemplate(section);
-			templateSet.add(newTemplate);
+			if (!fileSection.isConfigurationSection(myTemplateName)) {
+				throw new BBCDException(fileSection.getName(), "Illegal template section", myTemplateName);
+			}
+			ConfigurationSection myTemplateFileSection = fileSection.getConfigurationSection(myTemplateName);
+			addTemplate(myTemplateFileSection);
 		}
 	}
-	
 
 	public BBCDTemplate findTemplate(String templateName) {
-		for (BBCDTemplate configTemplate : templateSet) {
+		for (BBCDTemplate configTemplate : templates) {
 			if (configTemplate.getName().equalsIgnoreCase(templateName)) {
 				return configTemplate;
 			}
@@ -62,4 +60,3 @@ public class ConfigSection {
 	}
 
 }
-

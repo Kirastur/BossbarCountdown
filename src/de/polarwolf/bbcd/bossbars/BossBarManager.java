@@ -5,26 +5,28 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import de.polarwolf.bbcd.api.BBCDBossBar;
-import de.polarwolf.bbcd.api.BBCDException;
-import de.polarwolf.bbcd.api.BBCDTemplate;
+
+import de.polarwolf.bbcd.api.BBCDOrchestrator;
+import de.polarwolf.bbcd.config.BBCDTemplate;
 import de.polarwolf.bbcd.config.ConfigManager;
+import de.polarwolf.bbcd.events.EventManager;
+import de.polarwolf.bbcd.exception.BBCDException;
 
 public class BossBarManager {
 
-	
 	protected final Plugin plugin;
 	protected final ConfigManager configManager;
+	protected final EventManager eventManager;
+	private boolean disabled = false;
 	protected Set<BBCDBossBar> bbcdBossBars = new HashSet<>();
 	protected Scheduler scheduler = null;
-	
 
-	public BossBarManager(Plugin plugin, ConfigManager configManager) {
-		this.plugin = plugin;
-		this.configManager = configManager;
+	public BossBarManager(BBCDOrchestrator orchestrator) {
+		this.plugin = orchestrator.getPlugin();
+		this.configManager = orchestrator.getConfigManager();
+		this.eventManager = orchestrator.getEventManager();
 	}
-	
-	
+
 	// Get the complete list of of active BBCDBossBars.
 	// Perhaps you need it for some advanced game-features.
 	// BBCDBossBars already finished are excluded from set.
@@ -37,8 +39,7 @@ public class BossBarManager {
 		}
 		return myBbcdBossBars;
 	}
-	
-	
+
 	// Find the BBCDBossBar given by Player and Template.
 	// BBCDBossBars already finished are excluded from search.
 	public BBCDBossBar findBbcdBossBar(Player player, BBCDTemplate bbcdTemplate) {
@@ -49,30 +50,32 @@ public class BossBarManager {
 		}
 		return null;
 	}
-	
-	
+
 	// Simply create a new BBCDBossbar-object.
 	// Override this for custom objects.
 	protected BBCDBossBar createBbcdBossBar(Player player, BBCDTemplate bbcdTemplate) {
 		return new BBCDBossBar(plugin, player, bbcdTemplate);
 	}
-	
-	
+
+	protected void prepareBbcdBossBar(BBCDBossBar bbcdBossBar) {
+		bbcdBossBar.setEventHelper(eventManager.getEventHelper());
+	}
+
 	// Add a new BBCDBossbar for the given player using the given template.
 	// Starts the scheduler if needed.
-	// A previous BBCDBossbar gets overwritten with no action executed 
+	// A previous BBCDBossbar gets overwritten with no action executed
 	public BBCDBossBar addBbcdBossBar(Player player, BBCDTemplate bbcdTemplate) {
 		BBCDBossBar oldBbcdBossBar = findBbcdBossBar(player, bbcdTemplate);
 		if (oldBbcdBossBar != null) {
 			oldBbcdBossBar.finish();
 		}
-		
+
 		BBCDBossBar newBbcdBossBar = createBbcdBossBar(player, bbcdTemplate);
+		prepareBbcdBossBar(newBbcdBossBar);
 		bbcdBossBars.add(newBbcdBossBar);
 		startScheduler();
 		return newBbcdBossBar;
 	}
-	
 
 	// Called by the scheduler to increment the progress of BBCDBossBars
 	// and executes modification if End is reached
@@ -81,7 +84,7 @@ public class BossBarManager {
 			stopScheduler();
 			return;
 		}
-		
+
 		Set<BBCDBossBar> myBbcdBossBars = new HashSet<>(bbcdBossBars);
 		for (BBCDBossBar bbcdBossBar : myBbcdBossBars) {
 			try {
@@ -98,8 +101,7 @@ public class BossBarManager {
 			}
 		}
 	}
-	
-	
+
 	// Cancel all active BBCDBossBars for the given player
 	// Needed for the PlayerQuitEvent
 	public void cancel(Player player) {
@@ -109,7 +111,6 @@ public class BossBarManager {
 			}
 		}
 	}
-	
 
 	// Start the Scheduler-Task if needed.
 	protected void startScheduler() {
@@ -118,8 +119,7 @@ public class BossBarManager {
 			scheduler.runTaskTimer(plugin, 1, 1);
 		}
 	}
-	
-	
+
 	// Stop the scheduler
 	protected void stopScheduler() {
 		if (scheduler != null) {
@@ -127,5 +127,18 @@ public class BossBarManager {
 			scheduler = null;
 		}
 	}
-	
+
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	// Stop the Scheduler if the plugin gets disabled
+	public void disable() {
+		disabled = true;
+		stopScheduler();
+		for (BBCDBossBar myBbcdBossBar : getBbcdBossBars()) {
+			myBbcdBossBar.finish();
+		}
+	}
+
 }
